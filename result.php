@@ -8,7 +8,7 @@ if (!isset($_SESSION["student"])) {
 
 $student = $_SESSION["student"];
 
-function e($value) {
+function safeText {
     return htmlspecialchars((string)$value, ENT_QUOTES, "UTF-8");
 }
 ?>

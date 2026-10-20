@@ -21,14 +21,14 @@ $studentData = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    foreach ($studentData as $field => $value) {
-        $studentData[$field] = trim($_POST[$field] ?? "");
+    foreach ($studentData as $fieldName => $value) {
+        $studentData[$fieldName] = trim($_POST[$fieldName] ?? "");
     }
 
     // Check that every text/select/date field has an entry.
-    foreach ($studentData as $field => $value) {
+    foreach ($studentData as $fieldName => $value) {
         if ($value === "") {
-            $errors[$field] = "Please enter/select " . str_replace("_", " ", $field) . ".";
+            $errors[$fieldName] = "Please enter/select " . str_replace("_", " ", $fieldName) . ".";
         }
     }
 
@@ -57,16 +57,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
         $errors["image"] = "The image could not be uploaded. Please try again.";
     } else {
-        $file = $_FILES["image"];
-        $extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
+        $imageFile = $_FILES["image"];
+        $extensionension = strtolower(pathinfo($imageFile["name"], PATHINFO_EXTENSION));
 
-        if (!in_array($extension, $allowedExtensions, true)) {
+        if (!in_array($extensionension, $allowedExtensions, true)) {
             $errors["image"] = "Allowed image types: PNG, JPG, JPEG, GIF, WEBP.";
-        } elseif ($file["size"] > 2 * 1024 * 1024) {
+        } elseif ($imageFile["size"] > 2 * 1024 * 1024) {
             $errors["image"] = "Image size must not exceed 2 MB.";
         } else {
             // Check the actual file content, not only the filename extension.
-            $imageInfo = @getimagesize($file["tmp_name"]);
+            $imageInfo = @getimagesize($imageFile["tmp_name"]);
             if ($imageInfo === false) {
                 $errors["image"] = "The selected file is not a valid image.";
             }
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             mkdir($uploadDirectory, 0755, true);
         }
 
-        $newFileName = bin2hex(random_bytes(16)) . "." . $extension;
+        $newFileName = bin2hex(random_bytes(16)) . "." . $extensionension;
         $destination = $uploadDirectory . $newFileName;
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $destination)) {
@@ -97,15 +97,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-function e($value)
+function safeText
 {
     return htmlspecialchars((string)$value, ENT_QUOTES, "UTF-8");
 }
 
-function fieldError($field, $errors)
+function showErro($fieldName, $errors)
 {
-    if (isset($errors[$field])) {
-        return '<div class="text-danger small mt-1">' . e($errors[$field]) . '</div>';
+    if (isset($errors[$fieldName])) {
+        return '<div class="text-danger small mt-1">' . e($errors[$fieldName]) . '</div>';
     }
     return "";
 }
@@ -134,8 +134,8 @@ function fieldError($field, $errors)
                     <div class="alert alert-danger" role="alert">
                         <strong>Please correct the following:</strong>
                         <ul class="mb-0 mt-2">
-                            <?php foreach ($errors as $message): ?>
-                                <li><?= e($message) ?></li>
+                            <?php foreach ($errors as $statusMessage): ?>
+                                <li><?= e($statusMessage) ?></li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -149,22 +149,22 @@ function fieldError($field, $errors)
                                 <label for="name" class="form-label">Full Name *</label>
                                 <input type="text" class="form-control <?= isset($errors['name']) ? 'is-invalid' : '' ?>"
                                     id="name" name="name" value="<?= e($studentData['name']) ?>" required>
-                                <?= fieldError("name", $errors) ?>
+                                <?= showErro("name", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="pob" class="form-label">Place of Birth (POB) *</label>
                                 <input type="text" class="form-control" id="pob" name="pob" value="<?= e($studentData['pob']) ?>" required>
-                                <?= fieldError("pob", $errors) ?>
+                                <?= showErro("pob", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="dob" class="form-label">Date of Birth (DOB) *</label>
                                 <input type="date" class="form-control" id="dob" name="dob" value="<?= e($studentData['dob']) ?>" required>
-                                <?= fieldError("dob", $errors) ?>
+                                <?= showErro("dob", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="address" class="form-label">Address *</label>
                                 <input type="text" class="form-control" id="address" name="address" value="<?= e($studentData['address']) ?>" required>
-                                <?= fieldError("address", $errors) ?>
+                                <?= showErro("address", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="gender" class="form-label">Gender *</label>
@@ -173,24 +173,24 @@ function fieldError($field, $errors)
                                     <option value="Male" <?= $studentData['gender'] === 'Male' ? 'selected' : '' ?>>Male</option>
                                     <option value="Female" <?= $studentData['gender'] === 'Female' ? 'selected' : '' ?>>Female</option>
                                 </select>
-                                <?= fieldError("gender", $errors) ?>
+                                <?= showErro("gender", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="telephone" class="form-label">Telephone *</label>
                                 <input type="tel" class="form-control" id="telephone" name="telephone" value="<?= e($studentData['telephone']) ?>" required>
-                                <?= fieldError("telephone", $errors) ?>
+                                <?= showErro("telephone", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="email" class="form-label">Email *</label>
                                 <input type="email" class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>"
                                     id="email" name="email" value="<?= e($studentData['email']) ?>" required>
-                                <?= fieldError("email", $errors) ?>
+                                <?= showErro("email", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="image" class="form-label">Profile Image * (PNG/JPG/JPEG/GIF/WEBP)</label>
                                 <input type="file" class="form-control <?= isset($errors['image']) ? 'is-invalid' : '' ?>"
                                     id="image" name="image" accept=".png,.jpg,.jpeg,.gif,.webp,image/*" required>
-                                <?= fieldError("image", $errors) ?>
+                                <?= showErro("image", $errors) ?>
                             </div>
                         </div>
                     </fieldset>
@@ -201,12 +201,12 @@ function fieldError($field, $errors)
                             <div class="col-md-4">
                                 <label for="parent_name" class="form-label">Parent Name *</label>
                                 <input type="text" class="form-control" id="parent_name" name="parent_name" value="<?= e($studentData['parent_name']) ?>" required>
-                                <?= fieldError("parent_name", $errors) ?>
+                                <?= showErro("parent_name", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="parent_telephone" class="form-label">Parent Telephone *</label>
                                 <input type="tel" class="form-control" id="parent_telephone" name="parent_telephone" value="<?= e($studentData['parent_telephone']) ?>" required>
-                                <?= fieldError("parent_telephone", $errors) ?>
+                                <?= showErro("parent_telephone", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="relationship" class="form-label">Relationship *</label>
@@ -218,7 +218,7 @@ function fieldError($field, $errors)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <?= fieldError("relationship", $errors) ?>
+                                <?= showErro("relationship", $errors) ?>
                             </div>
                         </div>
                     </fieldset>
@@ -229,27 +229,27 @@ function fieldError($field, $errors)
                             <div class="col-md-4">
                                 <label for="student_id" class="form-label">Student ID *</label>
                                 <input type="text" class="form-control" id="student_id" name="student_id" value="<?= e($studentData['student_id']) ?>" required>
-                                <?= fieldError("student_id", $errors) ?>
+                                <?= showErro("student_id", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="faculty" class="form-label">Faculty *</label>
                                 <input type="text" class="form-control" id="faculty" name="faculty" value="<?= e($studentData['faculty']) ?>" required>
-                                <?= fieldError("faculty", $errors) ?>
+                                <?= showErro("faculty", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="department" class="form-label">Department *</label>
                                 <input type="text" class="form-control" id="department" name="department" value="<?= e($studentData['department']) ?>" required>
-                                <?= fieldError("department", $errors) ?>
+                                <?= showErro("department", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="class" class="form-label">Class *</label>
                                 <input type="text" class="form-control" id="class" name="class" value="<?= e($studentData['class']) ?>" required>
-                                <?= fieldError("class", $errors) ?>
+                                <?= showErro("class", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="registration_date" class="form-label">Registration Date *</label>
                                 <input type="date" class="form-control" id="registration_date" name="registration_date" value="<?= e($studentData['registration_date']) ?>" required>
-                                <?= fieldError("registration_date", $errors) ?>
+                                <?= showErro("registration_date", $errors) ?>
                             </div>
                         </div>
                     </fieldset>
