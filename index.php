@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Check that every text/select/date field has an entry.
     foreach ($studentData as $fieldName => $value) {
         if ($value === "") {
-            $errors[$fieldName] = "Please enter/select " . str_replace("_", " ", $fieldName) . ".";
+            $errors[$fieldName] = "Please enter/select " . str_replacsafeText("_", " ", $fieldName) . ".";
         }
     }
 
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $errors["image"] = "Image size must not exceed 2 MB.";
         } else {
             // Check the actual file content, not only the filename extension.
-            $imageInfo = @getimagesize($imageFile["tmp_name"]);
+            $imageInfo = @getimagesizsafeText($imageFile["tmp_name"]);
             if ($imageInfo === false) {
                 $errors["image"] = "The selected file is not a valid image.";
             }
@@ -83,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $newFileName = bin2hex(random_bytes(16)) . "." . $extensionension;
         $destination = $uploadDirectory . $newFileName;
 
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $destination)) {
+        if (move_uploaded_filsafeText($_FILES["image"]["tmp_name"], $destination)) {
             $imagePath = "uploads/" . $newFileName;
             $_SESSION["student"] = $studentData;
             $_SESSION["student"]["image"] = $imagePath;
@@ -105,7 +105,7 @@ function safeText
 function showErro($fieldName, $errors)
 {
     if (isset($errors[$fieldName])) {
-        return '<div class="text-danger small mt-1">' . e($errors[$fieldName]) . '</div>';
+        return '<div class="text-danger small mt-1">' . safeText($errors[$fieldName]) . '</div>';
     }
     return "";
 }
@@ -135,7 +135,7 @@ function showErro($fieldName, $errors)
                         <strong>Please correct the following:</strong>
                         <ul class="mb-0 mt-2">
                             <?php foreach ($errors as $statusMessage): ?>
-                                <li><?= e($statusMessage) ?></li>
+                                <li><?= safeText($statusMessage) ?></li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -148,22 +148,22 @@ function showErro($fieldName, $errors)
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Full Name *</label>
                                 <input type="text" class="form-control <?= isset($errors['name']) ? 'is-invalid' : '' ?>"
-                                    id="name" name="name" value="<?= e($studentData['name']) ?>" required>
+                                    id="name" name="name" value="<?= safeText($studentData['name']) ?>" required>
                                 <?= showErro("name", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="pob" class="form-label">Place of Birth (POB) *</label>
-                                <input type="text" class="form-control" id="pob" name="pob" value="<?= e($studentData['pob']) ?>" required>
+                                <input type="text" class="form-control" id="pob" name="pob" value="<?= safeText($studentData['pob']) ?>" required>
                                 <?= showErro("pob", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="dob" class="form-label">Date of Birth (DOB) *</label>
-                                <input type="date" class="form-control" id="dob" name="dob" value="<?= e($studentData['dob']) ?>" required>
+                                <input type="date" class="form-control" id="dob" name="dob" value="<?= safeText($studentData['dob']) ?>" required>
                                 <?= showErro("dob", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="address" class="form-label">Address *</label>
-                                <input type="text" class="form-control" id="address" name="address" value="<?= e($studentData['address']) ?>" required>
+                                <input type="text" class="form-control" id="address" name="address" value="<?= safeText($studentData['address']) ?>" required>
                                 <?= showErro("address", $errors) ?>
                             </div>
                             <div class="col-md-6">
@@ -177,13 +177,13 @@ function showErro($fieldName, $errors)
                             </div>
                             <div class="col-md-6">
                                 <label for="telephone" class="form-label">Telephone *</label>
-                                <input type="tel" class="form-control" id="telephone" name="telephone" value="<?= e($studentData['telephone']) ?>" required>
+                                <input type="tel" class="form-control" id="telephone" name="telephone" value="<?= safeText($studentData['telephone']) ?>" required>
                                 <?= showErro("telephone", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="email" class="form-label">Email *</label>
                                 <input type="email" class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>"
-                                    id="email" name="email" value="<?= e($studentData['email']) ?>" required>
+                                    id="email" name="email" value="<?= safeText($studentData['email']) ?>" required>
                                 <?= showErro("email", $errors) ?>
                             </div>
                             <div class="col-md-6">
@@ -200,12 +200,12 @@ function showErro($fieldName, $errors)
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="parent_name" class="form-label">Parent Name *</label>
-                                <input type="text" class="form-control" id="parent_name" name="parent_name" value="<?= e($studentData['parent_name']) ?>" required>
+                                <input type="text" class="form-control" id="parent_name" name="parent_name" value="<?= safeText($studentData['parent_name']) ?>" required>
                                 <?= showErro("parent_name", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="parent_telephone" class="form-label">Parent Telephone *</label>
-                                <input type="tel" class="form-control" id="parent_telephone" name="parent_telephone" value="<?= e($studentData['parent_telephone']) ?>" required>
+                                <input type="tel" class="form-control" id="parent_telephone" name="parent_telephone" value="<?= safeText($studentData['parent_telephone']) ?>" required>
                                 <?= showErro("parent_telephone", $errors) ?>
                             </div>
                             <div class="col-md-4">
@@ -213,8 +213,8 @@ function showErro($fieldName, $errors)
                                 <select class="form-select" id="relationship" name="relationship" required>
                                     <option value="">Choose relationship</option>
                                     <?php foreach (["Father", "Mother", "Guardian"] as $relation): ?>
-                                        <option value="<?= e($relation) ?>" <?= $studentData['relationship'] === $relation ? 'selected' : '' ?>>
-                                            <?= e($relation) ?>
+                                        <option value="<?= safeText($relation) ?>" <?= $studentData['relationship'] === $relation ? 'selected' : '' ?>>
+                                            <?= safeText($relation) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -228,27 +228,27 @@ function showErro($fieldName, $errors)
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="student_id" class="form-label">Student ID *</label>
-                                <input type="text" class="form-control" id="student_id" name="student_id" value="<?= e($studentData['student_id']) ?>" required>
+                                <input type="text" class="form-control" id="student_id" name="student_id" value="<?= safeText($studentData['student_id']) ?>" required>
                                 <?= showErro("student_id", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="faculty" class="form-label">Faculty *</label>
-                                <input type="text" class="form-control" id="faculty" name="faculty" value="<?= e($studentData['faculty']) ?>" required>
+                                <input type="text" class="form-control" id="faculty" name="faculty" value="<?= safeText($studentData['faculty']) ?>" required>
                                 <?= showErro("faculty", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="department" class="form-label">Department *</label>
-                                <input type="text" class="form-control" id="department" name="department" value="<?= e($studentData['department']) ?>" required>
+                                <input type="text" class="form-control" id="department" name="department" value="<?= safeText($studentData['department']) ?>" required>
                                 <?= showErro("department", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="class" class="form-label">Class *</label>
-                                <input type="text" class="form-control" id="class" name="class" value="<?= e($studentData['class']) ?>" required>
+                                <input type="text" class="form-control" id="class" name="class" value="<?= safeText($studentData['class']) ?>" required>
                                 <?= showErro("class", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="registration_date" class="form-label">Registration Date *</label>
-                                <input type="date" class="form-control" id="registration_date" name="registration_date" value="<?= e($studentData['registration_date']) ?>" required>
+                                <input type="date" class="form-control" id="registration_date" name="registration_date" value="<?= safeText($studentData['registration_date']) ?>" required>
                                 <?= showErro("registration_date", $errors) ?>
                             </div>
                         </div>
@@ -267,7 +267,7 @@ function showErro($fieldName, $errors)
             // Move the user to the first field with an error.
             document.addEventListener("DOMContentLoaded", function() {
                 const firstInvalid = document.querySelector(
-                    "#registrationForm [name='<?= e(array_key_first($errors)) ?>']"
+                    "#registrationForm [name='<?= safeText(array_key_first($errors)) ?>']"
                 );
                 if (firstInvalid) {
                     firstInvalid.focus();
