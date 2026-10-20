@@ -2,7 +2,7 @@
 session_start();
 
 $errors = [];
-$old = [
+$studentData = [
     "name" => "",
     "pob" => "",
     "dob" => "",
@@ -21,12 +21,12 @@ $old = [
 ];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    foreach ($old as $field => $value) {
-        $old[$field] = trim($_POST[$field] ?? "");
+    foreach ($studentData as $field => $value) {
+        $studentData[$field] = trim($_POST[$field] ?? "");
     }
 
     // Check that every text/select/date field has an entry.
-    foreach ($old as $field => $value) {
+    foreach ($studentData as $field => $value) {
         if ($value === "") {
             $errors[$field] = "Please enter/select " . str_replace("_", " ", $field) . ".";
         }
@@ -34,16 +34,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Name must contain only letters and spaces.
     if (
-        $old["name"] !== "" &&
-        !preg_match("/^[\p{L} ]+$/u", $old["name"])
+        $studentData["name"] !== "" &&
+        !preg_match("/^[\p{L} ]+$/u", $studentData["name"])
     ) {
         $errors["name"] = "Name must contain only letters and spaces.";
     }
 
     // Validate email format.
     if (
-        $old["email"] !== "" &&
-        !filter_var($old["email"], FILTER_VALIDATE_EMAIL)
+        $studentData["email"] !== "" &&
+        !filter_var($studentData["email"], FILTER_VALIDATE_EMAIL)
     ) {
         $errors["email"] = "Please enter a valid email address.";
     }
@@ -85,14 +85,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $destination)) {
             $imagePath = "uploads/" . $newFileName;
-            $_SESSION["student"] = $old;
+            $_SESSION["student"] = $studentData;
             $_SESSION["student"]["image"] = $imagePath;
 
             // Redirect to a separate page to display the submitted information.
             header("Location: result.php");
             exit;
         } else {
-            $errors["image"] = "The image could not be saved. Check the uploads folder permissions.";
+            $errors["image"] = "The image could not be saved. Check the uploads fstudentDataer permissions.";
         }
     }
 }
@@ -148,42 +148,42 @@ function fieldError($field, $errors)
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Full Name *</label>
                                 <input type="text" class="form-control <?= isset($errors['name']) ? 'is-invalid' : '' ?>"
-                                    id="name" name="name" value="<?= e($old['name']) ?>" required>
+                                    id="name" name="name" value="<?= e($studentData['name']) ?>" required>
                                 <?= fieldError("name", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="pob" class="form-label">Place of Birth (POB) *</label>
-                                <input type="text" class="form-control" id="pob" name="pob" value="<?= e($old['pob']) ?>" required>
+                                <input type="text" class="form-control" id="pob" name="pob" value="<?= e($studentData['pob']) ?>" required>
                                 <?= fieldError("pob", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="dob" class="form-label">Date of Birth (DOB) *</label>
-                                <input type="date" class="form-control" id="dob" name="dob" value="<?= e($old['dob']) ?>" required>
+                                <input type="date" class="form-control" id="dob" name="dob" value="<?= e($studentData['dob']) ?>" required>
                                 <?= fieldError("dob", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="address" class="form-label">Address *</label>
-                                <input type="text" class="form-control" id="address" name="address" value="<?= e($old['address']) ?>" required>
+                                <input type="text" class="form-control" id="address" name="address" value="<?= e($studentData['address']) ?>" required>
                                 <?= fieldError("address", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="gender" class="form-label">Gender *</label>
                                 <select class="form-select" id="gender" name="gender" required>
                                     <option value="">Choose gender</option>
-                                    <option value="Male" <?= $old['gender'] === 'Male' ? 'selected' : '' ?>>Male</option>
-                                    <option value="Female" <?= $old['gender'] === 'Female' ? 'selected' : '' ?>>Female</option>
+                                    <option value="Male" <?= $studentData['gender'] === 'Male' ? 'selected' : '' ?>>Male</option>
+                                    <option value="Female" <?= $studentData['gender'] === 'Female' ? 'selected' : '' ?>>Female</option>
                                 </select>
                                 <?= fieldError("gender", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="telephone" class="form-label">Telephone *</label>
-                                <input type="tel" class="form-control" id="telephone" name="telephone" value="<?= e($old['telephone']) ?>" required>
+                                <input type="tel" class="form-control" id="telephone" name="telephone" value="<?= e($studentData['telephone']) ?>" required>
                                 <?= fieldError("telephone", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="email" class="form-label">Email *</label>
                                 <input type="email" class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>"
-                                    id="email" name="email" value="<?= e($old['email']) ?>" required>
+                                    id="email" name="email" value="<?= e($studentData['email']) ?>" required>
                                 <?= fieldError("email", $errors) ?>
                             </div>
                             <div class="col-md-6">
@@ -200,12 +200,12 @@ function fieldError($field, $errors)
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="parent_name" class="form-label">Parent Name *</label>
-                                <input type="text" class="form-control" id="parent_name" name="parent_name" value="<?= e($old['parent_name']) ?>" required>
+                                <input type="text" class="form-control" id="parent_name" name="parent_name" value="<?= e($studentData['parent_name']) ?>" required>
                                 <?= fieldError("parent_name", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="parent_telephone" class="form-label">Parent Telephone *</label>
-                                <input type="tel" class="form-control" id="parent_telephone" name="parent_telephone" value="<?= e($old['parent_telephone']) ?>" required>
+                                <input type="tel" class="form-control" id="parent_telephone" name="parent_telephone" value="<?= e($studentData['parent_telephone']) ?>" required>
                                 <?= fieldError("parent_telephone", $errors) ?>
                             </div>
                             <div class="col-md-4">
@@ -213,7 +213,7 @@ function fieldError($field, $errors)
                                 <select class="form-select" id="relationship" name="relationship" required>
                                     <option value="">Choose relationship</option>
                                     <?php foreach (["Father", "Mother", "Guardian"] as $relation): ?>
-                                        <option value="<?= e($relation) ?>" <?= $old['relationship'] === $relation ? 'selected' : '' ?>>
+                                        <option value="<?= e($relation) ?>" <?= $studentData['relationship'] === $relation ? 'selected' : '' ?>>
                                             <?= e($relation) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -228,27 +228,27 @@ function fieldError($field, $errors)
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label for="student_id" class="form-label">Student ID *</label>
-                                <input type="text" class="form-control" id="student_id" name="student_id" value="<?= e($old['student_id']) ?>" required>
+                                <input type="text" class="form-control" id="student_id" name="student_id" value="<?= e($studentData['student_id']) ?>" required>
                                 <?= fieldError("student_id", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="faculty" class="form-label">Faculty *</label>
-                                <input type="text" class="form-control" id="faculty" name="faculty" value="<?= e($old['faculty']) ?>" required>
+                                <input type="text" class="form-control" id="faculty" name="faculty" value="<?= e($studentData['faculty']) ?>" required>
                                 <?= fieldError("faculty", $errors) ?>
                             </div>
                             <div class="col-md-4">
                                 <label for="department" class="form-label">Department *</label>
-                                <input type="text" class="form-control" id="department" name="department" value="<?= e($old['department']) ?>" required>
+                                <input type="text" class="form-control" id="department" name="department" value="<?= e($studentData['department']) ?>" required>
                                 <?= fieldError("department", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="class" class="form-label">Class *</label>
-                                <input type="text" class="form-control" id="class" name="class" value="<?= e($old['class']) ?>" required>
+                                <input type="text" class="form-control" id="class" name="class" value="<?= e($studentData['class']) ?>" required>
                                 <?= fieldError("class", $errors) ?>
                             </div>
                             <div class="col-md-6">
                                 <label for="registration_date" class="form-label">Registration Date *</label>
-                                <input type="date" class="form-control" id="registration_date" name="registration_date" value="<?= e($old['registration_date']) ?>" required>
+                                <input type="date" class="form-control" id="registration_date" name="registration_date" value="<?= e($studentData['registration_date']) ?>" required>
                                 <?= fieldError("registration_date", $errors) ?>
                             </div>
                         </div>
